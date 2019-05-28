@@ -5,6 +5,30 @@ import colorama as _colorama
 _logger = None
 
 #===================================================================================================
+def debug(*args):
+	_logger.debug(_force_to_string(*args))
+def info(*args):
+	_logger.info(_force_to_string(*args))
+def warning(*args):
+	_logger.warning(_force_to_string(*args))
+def error(*args):
+	_logger.error(_force_to_string(*args))
+def critical(*args):
+	_logger.critical(_force_to_string(*args))
+
+
+#===================================================================================================
+def _force_to_string(*args):
+	msg = ""
+	if (len(args) > 0):
+		msg = str(args[0])
+	if (len(args) > 1):
+		for arg in args[1:]:
+			msg += f" {str(arg)}"
+	return msg
+
+
+#===================================================================================================
 class _ColouredFormatter(_logging.Formatter):
 	def __init__(self, msg):
 		super().__init__(msg)
@@ -50,30 +74,6 @@ def _setup_logger(file, name="logger", reset=False):
 		fh.setLevel(_logging.DEBUG)
 		fh.setFormatter(_logging.Formatter(formatting))
 		_logger.addHandler(fh)
-
-
-#===================================================================================================
-def _force_to_string(*args):
-	msg = ""
-	if (len(args) > 0):
-		msg = str(args[0])
-	if (len(args) > 1):
-		for arg in args[1:]:
-			msg += f" {str(arg)}"
-	return msg
-
-
-#===================================================================================================
-def debug(*args):
-	_logger.debug(_force_to_string(*args))
-def info(*args):
-	_logger.info(_force_to_string(*args))
-def warning(*args):
-	_logger.warning(_force_to_string(*args))
-def error(*args):
-	_logger.error(_force_to_string(*args))
-def critical(*args):
-	_logger.critical(_force_to_string(*args))
 
 
 #===================================================================================================
