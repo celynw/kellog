@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import logging as _logging
 import colorama as _colorama
+import subprocess as _subprocess
 
 _logger = None
 
@@ -15,6 +16,16 @@ def error(*args):
 	_logger.error(_force_to_string(*args))
 def critical(*args):
 	_logger.critical(_force_to_string(*args))
+
+
+#===================================================================================================
+def _git_rev(log=info):
+	try:
+		output = _subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], stderr=_subprocess.STDOUT, universal_newlines=True)
+	except _subprocess.CalledProcessError as exc:
+		error(exc.output)
+	else:
+		log("Git revision:", output)
 
 
 #===================================================================================================
