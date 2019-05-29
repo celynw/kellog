@@ -2,6 +2,8 @@
 import logging as _logging
 import colorama as _colorama
 import subprocess as _subprocess
+import inspect as _inspect
+from pathlib import Path
 
 _logger = None
 
@@ -20,8 +22,9 @@ def critical(*args):
 
 #===================================================================================================
 def _git_rev(log=info):
+	cwd = Path(_inspect.stack()[1][1]).parent
 	try:
-		output = _subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], stderr=_subprocess.STDOUT, universal_newlines=True)
+		output = _subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], stderr=_subprocess.STDOUT, universal_newlines=True, cwd=cwd)
 	except _subprocess.CalledProcessError as exc:
 		error(exc.output)
 	else:
