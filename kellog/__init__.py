@@ -71,7 +71,7 @@ class _ColouredFormatter(_logging.Formatter):
 
 #===================================================================================================
 def _setup_logger(file, name="logger", reset=False):
-	if (reset):
+	if reset:
 		open(file, "w").close() # Delete contents
 	global _logger
 	if _logger:
@@ -88,6 +88,14 @@ def _setup_logger(file, name="logger", reset=False):
 		fh.setLevel(_logging.DEBUG)
 		fh.setFormatter(_logging.Formatter(formatting))
 		_logger.addHandler(fh)
+
+
+#===================================================================================================
+def _write_args(args, filename="args.txt"):
+	with open(filename, "w") as fp:
+		for k, v in args.__dict__.items():
+			info(f"{k}: {v}")
+			fp.write(f"{k}: {v}\n")
 
 
 #===================================================================================================
