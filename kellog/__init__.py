@@ -4,6 +4,7 @@ import colorama as _colorama
 import subprocess as _subprocess
 import inspect as _inspect
 from pathlib import Path
+import ujson
 
 _logger = None
 
@@ -91,11 +92,13 @@ def _setup_logger(file, name="logger", reset=False):
 
 
 #===================================================================================================
-def _write_args(args, filename="args.txt"):
-	with open(filename, "w") as fp:
+def _write_args(args, filename="args.json", log=info):
+	if log:
+		log("Arguments: ")
 		for k, v in args.__dict__.items():
-			info(f"{k}: {v}")
-			fp.write(f"{k}: {v}\n")
+			log(f"  {k}: {v}")
+	with open(filename, "w") as file:
+		ujson.dump(args.__dict__, file, indent=2, ensure_ascii=False, escape_forward_slashes=False, sort_keys=False)
 
 
 #===================================================================================================
