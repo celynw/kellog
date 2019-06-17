@@ -7,5 +7,5 @@ setup(
 	description = "Easy logging",
 	author = "Celyn Walters",
 	packages = ["kellog"],
-	# install_requires=["bar", "greek"], # external packages as dependencies
+	install_requires=["colorama", "ujson"],
 )
