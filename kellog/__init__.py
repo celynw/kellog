@@ -94,11 +94,14 @@ def _setup_logger(file, name="logger", reset=False):
 #===================================================================================================
 def _write_args(args, filename="args.json", log=info):
 	if log:
+		import __main__ as main
+		log(f"Main script: {main.__file__}")
 		log("Arguments: ")
 		for k, v in args.__dict__.items():
 			log(f"  {k}: {v}")
-	with open(filename, "w") as file:
-		ujson.dump(args.__dict__, file, indent=2, ensure_ascii=False, escape_forward_slashes=False, sort_keys=False)
+	if filename is not None:
+		with open(filename, "w") as file:
+			ujson.dump(args.__dict__, file, indent=2, ensure_ascii=False, escape_forward_slashes=False, sort_keys=False)
 
 
 #===================================================================================================
