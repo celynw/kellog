@@ -33,8 +33,7 @@ def critical(*args):
 
 
 #===================================================================================================
-def _git_rev(log=info):
-	cwd = _Path(_inspect.stack()[1][1]).parent
+def _git_rev(log=info, cwd=_Path(_inspect.stack()[1][1]).parent): # Parent of called script by default
 	try:
 		repo = _Repo(cwd)
 		sha = repo.head.commit.hexsha
