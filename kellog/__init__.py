@@ -10,14 +10,24 @@ _logger = None
 
 #===================================================================================================
 def debug(*args):
+	if _logger is None:
+		_setup_logger("/tmp/log", "default_logger", True)
 	_logger.debug(_force_to_string(*args))
 def info(*args):
+	if _logger is None:
+		_setup_logger("/tmp/log", "default_logger", True)
 	_logger.info(_force_to_string(*args))
 def warning(*args):
+	if _logger is None:
+		_setup_logger("/tmp/log", "default_logger", True)
 	_logger.warning(_force_to_string(*args))
 def error(*args):
+	if _logger is None:
+		_setup_logger("/tmp/log", "default_logger", True)
 	_logger.error(_force_to_string(*args))
 def critical(*args):
+	if _logger is None:
+		_setup_logger("/tmp/log", "default_logger", True)
 	_logger.critical(_force_to_string(*args))
 
 
@@ -102,11 +112,3 @@ def _write_args(args, filename="args.json", log=info):
 	if filename is not None:
 		with open(filename, "w") as file:
 			ujson.dump(args.__dict__, file, indent=2, ensure_ascii=False, escape_forward_slashes=False, sort_keys=False)
-
-
-#===================================================================================================
-if (__name__ == "__main__"):
-	warning("log.py is supposed to be imported with 'from log import *'")
-else:
-	if not _logger:
-		_setup_logger("/tmp/log", "default_logger", True)
