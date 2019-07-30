@@ -7,5 +7,5 @@ setup(
 	description = "Easy logging",
 	author = "Celyn Walters",
 	packages = ["kellog"],
-	install_requires=["colorama", "ujson"],
+	install_requires=["colorama", "ujson", "gitpython"],
 )

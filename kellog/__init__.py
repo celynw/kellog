@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 import logging as _logging
 import colorama as _colorama
-import subprocess as _subprocess
+from pathlib import Path as _Path
 import inspect as _inspect
-from pathlib import Path
-import ujson
+# import subprocess as _subprocess
+import ujson as _ujson
+from git import Repo as _Repo
 
 _logger = None
 
@@ -33,12 +34,16 @@ def critical(*args):
 
 #===================================================================================================
 def _git_rev(log=info):
-	cwd = Path(_inspect.stack()[1][1]).parent
+	cwd = _Path(_inspect.stack()[1][1]).parent
 	try:
-		output = str(_subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], stderr=_subprocess.STDOUT, universal_newlines=True, cwd=cwd)).strip()
-	except _subprocess.CalledProcessError as exc:
-		error(exc.output)
+		repo = _Repo(cwd)
+		sha = repo.head.commit.hexsha
+		output = repo.git.rev_parse(sha, short=7)
+	except Exception as e:
+		error(e.output)
 	else:
+		if repo.is_dirty():
+			output += " (dirty)"
 		log("Git revision:", output)
 
 
@@ -111,4 +116,4 @@ def _write_args(args, filename="args.json", log=info):
 			log(f"  {k}: {v}")
 	if filename is not None:
 		with open(filename, "w") as file:
-			ujson.dump(args.__dict__, file, indent=2, ensure_ascii=False, escape_forward_slashes=False, sort_keys=False)
+			_ujson.dump(args.__dict__, file, indent=2, ensure_ascii=False, escape_forward_slashes=False, sort_keys=False)
