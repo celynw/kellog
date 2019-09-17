@@ -144,17 +144,18 @@ def write_args(args: argparse.Namespace, filePath: Path=Path("args.json"), log: 
 		filePath (Path, optional): Path to save the arguments to. Defaults to Path("args.json").
 		log (Callable, optional): Logging/printing function to use. Defaults to info.
 	"""
+	argsDict = args.__dict__.copy()
 	if log:
 		import __main__ as main
 		log(f"Main script: {main.__file__}")
 		log("Arguments: ")
-		for k, v in args.__dict__.items():
+		for k, v in argsDict.items():
 			log(f"  {k}: {v}")
 	if filePath is not None:
-		for k, v in args.__dict__.items():
-			args.__dict__[k] = str(v) if type(v) not in [str, float, int, bool] else v
+		for k, v in argsDict.items():
+			argsDict[k] = str(v) if type(v) not in [str, float, int, bool] else v
 		with open(str(filePath), "w") as file:
-			ujson.dump(args.__dict__, file, indent=2, ensure_ascii=False, escape_forward_slashes=False, sort_keys=False)
+			ujson.dump(argsDict, file, indent=2, ensure_ascii=False, escape_forward_slashes=False, sort_keys=False)
 
 
 # ==================================================================================================
