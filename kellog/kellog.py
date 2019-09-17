@@ -12,20 +12,20 @@ name = "kellog"
 ready = False
 
 # ==================================================================================================
-def setup_logger(filename: str, newName: str="kellog", reset: bool=False):
+def setup_logger(filePath: Path, newName: str="kellog", reset: bool=False):
 	"""
 	Set up logger to also log to a file.
 
 	Args:
-		filename (str): Output file
+		filePath (Path): Output file
 		newName (str, optional): Reset the logger name to this. Defaults to "kellog".
-		reset (bool, optional): Delete the contents of `filename` first. Defaults to False.
+		reset (bool, optional): Delete the contents of `filePath` first. Defaults to False.
 	"""
 	global name, ready
 	name = newName
 
 	if reset:
-		open(filename, "w").close() # Delete contents
+		open(filePath, "w").close() # Delete contents
 
 	logger = logging.getLogger(name)
 	if logger:
@@ -38,8 +38,8 @@ def setup_logger(filename: str, newName: str="kellog", reset: bool=False):
 	ch.setFormatter(ColouredFormatter(formatting))
 	logger.addHandler(ch)
 
-	if filename:
-		fh = logging.FileHandler(filename)
+	if filePath:
+		fh = logging.FileHandler(filePath)
 		fh.setLevel(logging.DEBUG)
 		fh.setFormatter(logging.Formatter(formatting))
 		logger.addHandler(fh)
@@ -56,7 +56,7 @@ def debug(*args: Any):
 		anyting (Any): Will be converted to a string using its __str__.
 	"""
 	if not ready:
-		setup_logger("/tmp/log", "kellog", True)
+		setup_logger(Path("/tmp/log"), "kellog", True)
 	logger = logging.getLogger(name)
 	logger.debug(force_to_string(*args))
 
@@ -70,7 +70,7 @@ def info(*args: str):
 		anyting (Any): Will be converted to a string using its __str__.
 	"""
 	if not ready:
-		setup_logger("/tmp/log", "kellog", True)
+		setup_logger(Path("/tmp/log"), "kellog", True)
 	logger = logging.getLogger(name)
 	logger.info(force_to_string(*args))
 
@@ -84,7 +84,7 @@ def warning(*args: str):
 		anyting (Any): Will be converted to a string using its __str__.
 	"""
 	if not ready:
-		setup_logger("/tmp/log", "kellog", True)
+		setup_logger(Path("/tmp/log"), "kellog", True)
 	logger = logging.getLogger(name)
 	logger.warning(force_to_string(*args))
 
@@ -98,7 +98,7 @@ def error(*args: str):
 		anyting (Any): Will be converted to a string using its __str__.
 	"""
 	if not ready:
-		setup_logger("/tmp/log", "kellog", True)
+		setup_logger(Path("/tmp/log"), "kellog", True)
 	logger = logging.getLogger(name)
 	logger.error(force_to_string(*args))
 
@@ -112,7 +112,7 @@ def critical(*args: Any):
 		anyting (Any): Will be converted to a string using its __str__.
 	"""
 	if not ready:
-		setup_logger("/tmp/log", "kellog", True)
+		setup_logger(Path("/tmp/log"), "kellog", True)
 	logger = logging.getLogger(name)
 	logger.critical(force_to_string(*args))
 
@@ -135,13 +135,13 @@ def git_rev(log: Callable=info):
 
 
 # ==================================================================================================
-def write_args(args: argparse.Namespace, filename: str="args.json", log: Callable=info):
+def write_args(args: argparse.Namespace, filePath: Path=Path("args.json"), log: Callable=info):
 	"""
 	Print the argparse arguments in a nice list, and optionally saves to file.
 
 	Args:
 		args (argparse.Namespace): Input arguments from `parser.parse_args()`
-		filename (str, optional): Filename to save the arguments to. Defaults to "args.json".
+		filePath (Path, optional): Path to save the arguments to. Defaults to Path("args.json").
 		log (Callable, optional): Logging/printing function to use. Defaults to info.
 	"""
 	if log:
@@ -150,8 +150,10 @@ def write_args(args: argparse.Namespace, filename: str="args.json", log: Callabl
 		log("Arguments: ")
 		for k, v in args.__dict__.items():
 			log(f"  {k}: {v}")
-	if filename is not None:
-		with open(filename, "w") as file:
+	if filePath is not None:
+		for k, v in args.__dict__.items():
+			args.__dict__[k] = str(v) if type(v) not in [str, float, int, bool] else v
+		with open(str(filePath), "w") as file:
 			ujson.dump(args.__dict__, file, indent=2, ensure_ascii=False, escape_forward_slashes=False, sort_keys=False)
 
 
