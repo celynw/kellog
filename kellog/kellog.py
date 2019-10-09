@@ -28,6 +28,7 @@ def setup_logger(filePath: Path, newName: str="kellog", reset: bool=False):
 		open(filePath, "w").close() # Delete contents
 
 	logger = logging.getLogger(name)
+	logger.propagate = False
 	if logger:
 		logger.handlers = []
 	logger = logging.getLogger(name)
