@@ -8,30 +8,30 @@ import argparse
 import ujson
 from sys import stdout
 
-name = "kellog"
+loggerName = "kellog"
 ready = False
 
 # ==================================================================================================
-def setup_logger(filePath: Path, newName: str="kellog", reset: bool=False):
+def setup_logger(filePath: Path=None, name: str="kellog", reset: bool=False):
 	"""
 	Set up logger to also log to a file.
 
 	Args:
 		filePath (Path): Output file
-		newName (str, optional): Reset the logger name to this. Defaults to "kellog".
+		name (str, optional): Reset the logger name to this. Defaults to "kellog".
 		reset (bool, optional): Delete the contents of `filePath` first. Defaults to False.
 	"""
-	global name, ready
-	name = newName
+	global loggerName, ready
+	loggerName = name
 
 	if reset:
 		open(filePath, "w").close() # Delete contents
 
-	logger = logging.getLogger(name)
+	logger = logging.getLogger(loggerName)
 	logger.propagate = False
 	if logger:
 		logger.handlers = []
-	logger = logging.getLogger(name)
+	logger = logging.getLogger(loggerName)
 	logger.setLevel(logging.DEBUG)
 	ch = logging.StreamHandler(stream=stdout)
 	ch.setLevel(logging.DEBUG)
@@ -57,8 +57,8 @@ def debug(*args: Any):
 		anyting (Any): Will be converted to a string using its __str__.
 	"""
 	if not ready:
-		setup_logger(Path("/tmp/log"), "kellog", True)
-	logger = logging.getLogger(name)
+		setup_logger(name="kellog")
+	logger = logging.getLogger(loggerName)
 	logger.debug(force_to_string(*args))
 
 
@@ -71,8 +71,8 @@ def info(*args: str):
 		anyting (Any): Will be converted to a string using its __str__.
 	"""
 	if not ready:
-		setup_logger(Path("/tmp/log"), "kellog", True)
-	logger = logging.getLogger(name)
+		setup_logger(name="kellog")
+	logger = logging.getLogger(loggerName)
 	logger.info(force_to_string(*args))
 
 
@@ -85,8 +85,8 @@ def warning(*args: str):
 		anyting (Any): Will be converted to a string using its __str__.
 	"""
 	if not ready:
-		setup_logger(Path("/tmp/log"), "kellog", True)
-	logger = logging.getLogger(name)
+		setup_logger(name="kellog")
+	logger = logging.getLogger(loggerName)
 	logger.warning(force_to_string(*args))
 
 
@@ -99,8 +99,8 @@ def error(*args: str):
 		anyting (Any): Will be converted to a string using its __str__.
 	"""
 	if not ready:
-		setup_logger(Path("/tmp/log"), "kellog", True)
-	logger = logging.getLogger(name)
+		setup_logger(name="kellog")
+	logger = logging.getLogger(loggerName)
 	logger.error(force_to_string(*args))
 
 
@@ -113,8 +113,8 @@ def critical(*args: Any):
 		anyting (Any): Will be converted to a string using its __str__.
 	"""
 	if not ready:
-		setup_logger(Path("/tmp/log"), "kellog", True)
-	logger = logging.getLogger(name)
+		setup_logger(name="kellog")
+	logger = logging.getLogger(loggerName)
 	logger.critical(force_to_string(*args))
 
 
