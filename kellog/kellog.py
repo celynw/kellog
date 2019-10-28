@@ -17,7 +17,7 @@ def setup_logger(filePath: Path=None, name: str="kellog", reset: bool=False):
 	Set up logger to also log to a file.
 
 	Args:
-		filePath (Path): Output file
+		filePath (Path, optional): Output file. Defaults to None.
 		name (str, optional): Reset the logger name to this. Defaults to "kellog".
 		reset (bool, optional): Delete the contents of `filePath` first. Defaults to False.
 	"""
@@ -54,7 +54,7 @@ def debug(*args: Any):
 	Output a debug message (green).
 
 	Args:
-		anyting (Any): Will be converted to a string using its __str__.
+		*args (Any): Will be converted to a string using its __str__.
 	"""
 	if not ready:
 		setup_logger(name="kellog")
@@ -68,7 +68,7 @@ def info(*args: str):
 	Output an info message (grey).
 
 	Args:
-		anyting (Any): Will be converted to a string using its __str__.
+		*args (Any): Will be converted to a string using its __str__.
 	"""
 	if not ready:
 		setup_logger(name="kellog")
@@ -82,7 +82,7 @@ def warning(*args: str):
 	Output a warning message (orange).
 
 	Args:
-		anyting (Any): Will be converted to a string using its __str__.
+		*args (Any): Will be converted to a string using its __str__.
 	"""
 	if not ready:
 		setup_logger(name="kellog")
@@ -96,7 +96,7 @@ def error(*args: str):
 	Output an error message (red).
 
 	Args:
-		anyting (Any): Will be converted to a string using its __str__.
+		*args (Any): Will be converted to a string using its __str__.
 	"""
 	if not ready:
 		setup_logger(name="kellog")
@@ -110,7 +110,7 @@ def critical(*args: Any):
 	Output a critical message (bright red).
 
 	Args:
-		anyting (Any): Will be converted to a string using its __str__.
+		*args (Any): Will be converted to a string using its __str__.
 	"""
 	if not ready:
 		setup_logger(name="kellog")
@@ -154,16 +154,18 @@ def write_args(args: argparse.Namespace, filePath: Path=Path("args.json"), log: 
 			log(f"  {k}: {v}")
 	if filePath is not None:
 		for k, v in argsDict.items():
-			argsDict[k] = str(v) if type(v) not in [str, float, int, bool] else v
-		with open(str(filePath), "w") as file:
+			argsDict[k] = str(v) if not isinstance(v, (str, float, int, bool)) else v
+		with open(filePath, "w") as file:
 			ujson.dump(argsDict, file, indent=2, ensure_ascii=False, escape_forward_slashes=False, sort_keys=False)
 
 
 # ==================================================================================================
 class ColouredFormatter(logging.Formatter):
+	# ----------------------------------------------------------------------------------------------
 	def __init__(self, msg: str):
 		super().__init__(msg)
 
+	# ----------------------------------------------------------------------------------------------
 	def format(self, record: logging.LogRecord) -> str:
 		"""
 		Prefixes with the logging level and assigns a colour.
