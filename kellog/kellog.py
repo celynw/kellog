@@ -1,10 +1,9 @@
-from typing import Any, Callable
+#!/usr/bin/env python2
 import logging
 import colorama
 from pathlib import Path
 import inspect
 import subprocess
-import argparse
 import ujson
 from sys import stdout
 
@@ -12,7 +11,7 @@ loggerName = "kellog"
 ready = False
 
 # ==================================================================================================
-def setup_logger(filePath: Path=None, name: str="kellog", reset: bool=False):
+def setup_logger(filePath=None, name="kellog", reset=False):
 	"""
 	Set up logger to also log to a file.
 
@@ -49,7 +48,7 @@ def setup_logger(filePath: Path=None, name: str="kellog", reset: bool=False):
 
 
 # ==================================================================================================
-def debug(*args: Any):
+def debug(*args):
 	"""
 	Output a debug message (green).
 
@@ -63,7 +62,7 @@ def debug(*args: Any):
 
 
 # ==================================================================================================
-def info(*args: str):
+def info(*args):
 	"""
 	Output an info message (grey).
 
@@ -77,7 +76,7 @@ def info(*args: str):
 
 
 # ==================================================================================================
-def warning(*args: str):
+def warning(*args):
 	"""
 	Output a warning message (orange).
 
@@ -91,7 +90,7 @@ def warning(*args: str):
 
 
 # ==================================================================================================
-def error(*args: str):
+def error(*args):
 	"""
 	Output an error message (red).
 
@@ -105,7 +104,7 @@ def error(*args: str):
 
 
 # ==================================================================================================
-def critical(*args: Any):
+def critical(*args):
 	"""
 	Output a critical message (bright red).
 
@@ -119,7 +118,7 @@ def critical(*args: Any):
 
 
 # ==================================================================================================
-def git_rev(log: Callable=info):
+def git_rev(log=info):
 	"""
 	Print out the git revision (short hash).
 
@@ -128,7 +127,7 @@ def git_rev(log: Callable=info):
 	"""
 	cwd = Path(inspect.stack()[1][1]).parent
 	try:
-		output = str(subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], stderr=subprocess.STDOUT, universal_newlines=True, cwd=cwd)).strip()
+		output = str(subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], stderr=subprocess.STDOUT, universal_newlines=True, cwd=str(cwd))).strip()
 	except subprocess.CalledProcessError as exc:
 		error(exc.output)
 	else:
@@ -136,7 +135,7 @@ def git_rev(log: Callable=info):
 
 
 # ==================================================================================================
-def write_args(args: argparse.Namespace, filePath: Path=Path("args.json"), log: Callable=info):
+def write_args(args, filePath=Path("args.json"), log=info):
 	"""
 	Print the argparse arguments in a nice list, and optionally saves to file.
 
@@ -148,10 +147,10 @@ def write_args(args: argparse.Namespace, filePath: Path=Path("args.json"), log: 
 	argsDict = args.__dict__.copy()
 	if log:
 		import __main__ as main
-		log(f"Main script: {main.__file__}")
+		log("Main script: {}".format(str(main.__file__)))
 		log("Arguments: ")
 		for k, v in argsDict.items():
-			log(f"  {k}: {v}")
+			log("  {}: {}".format(str(k), str(v)))
 	if filePath is not None:
 		for k, v in argsDict.items():
 			argsDict[k] = str(v) if not isinstance(v, (str, float, int, bool)) else v
@@ -162,11 +161,11 @@ def write_args(args: argparse.Namespace, filePath: Path=Path("args.json"), log: 
 # ==================================================================================================
 class ColouredFormatter(logging.Formatter):
 	# ----------------------------------------------------------------------------------------------
-	def __init__(self, msg: str):
-		super().__init__(msg)
+	def __init__(self, msg):
+		super(ColouredFormatter, self).__init__(msg)
 
 	# ----------------------------------------------------------------------------------------------
-	def format(self, record: logging.LogRecord) -> str:
+	def format(self, record):
 		"""
 		Prefixes with the logging level and assigns a colour.
 
@@ -195,11 +194,11 @@ class ColouredFormatter(logging.Formatter):
 			prefix = ""
 		suffix = colorama.Style.RESET_ALL
 
-		return prefix + super().format(record) + suffix
+		return prefix + super(ColouredFormatter, self).format(record) + suffix
 
 
 # ==================================================================================================
-def force_to_string(*args: Any) -> str:
+def force_to_string(*args):
 	"""
 	Force the input to be a string.
 
@@ -211,6 +210,6 @@ def force_to_string(*args: Any) -> str:
 		msg = str(args[0])
 	if (len(args) > 1):
 		for arg in args[1:]:
-			msg += f" {str(arg)}"
+			msg += " {}".format(str(arg))
 
 	return msg
