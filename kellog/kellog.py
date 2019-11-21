@@ -1,3 +1,7 @@
+import sys
+assert sys.version_info >= (3, 6) # For f-strings
+del sys
+
 from typing import Any, Callable
 import logging
 import colorama
