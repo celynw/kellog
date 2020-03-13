@@ -2,7 +2,7 @@
 # -*- coding: future_fstrings -*-
 import logging
 import colorama
-from pathlib import Path
+from pathlib2 import Path
 import inspect
 import subprocess
 import ujson
