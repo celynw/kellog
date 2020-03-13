@@ -1,4 +1,5 @@
 #!/usr/bin/env python2
+# -*- coding: future_fstrings -*-
 import logging
 import colorama
 from pathlib import Path
@@ -147,10 +148,10 @@ def write_args(args, filePath=Path("args.json"), log=info):
 	argsDict = args.__dict__.copy()
 	if log:
 		import __main__ as main
-		log("Main script: {}".format(str(main.__file__)))
+		log(f"Main script: {main.__file__}")
 		log("Arguments: ")
 		for k, v in argsDict.items():
-			log("  {}: {}".format(str(k), str(v)))
+			log(f"  {k}: {v}")
 	if filePath is not None:
 		for k, v in argsDict.items():
 			argsDict[k] = str(v) if not isinstance(v, (str, float, int, bool)) else v
@@ -210,6 +211,6 @@ def force_to_string(*args):
 		msg = str(args[0])
 	if (len(args) > 1):
 		for arg in args[1:]:
-			msg += " {}".format(str(arg))
+			msg += f" {str(arg)}"
 
 	return msg
