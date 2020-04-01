@@ -61,23 +61,57 @@ def setup_logger(filePath: Path = None, name: str = "kellog", reset: bool = Fals
 
 
 # ==================================================================================================
-def retrieve_name(var):
+def retrieve_name(vars):
 	# Get code which called kellog function
 	fName = inspect.currentframe().f_back.f_code.co_name
 	call = inspect.getframeinfo(inspect.currentframe().f_back.f_back).code_context[0].strip()
 
-	varNames = re.findall(rf"{fName}[^(]*\(([^)]*)\)", call)
-	if varNames:
-		global nameIter
-		varName = varNames[nameIter]
-		if len(varNames) > 1 and nameIter < len(varNames) - 1:
-			nameIter += 1
-		else:
-			nameIter = 0
-		if not varName.startswith(('"', "'", 'f"', "f'")):
-			return varName
+	# Python regex isn't really powerful enough for nested braces
+	# PROCEDURE:
+	# - Find first instance of fName which is followed by any whitespace (not newline), then an opening parenthesis
+	# - Iterate through characters (including newlines and whitespace) until recursion level reaches the top again
+	# Repeat this again, all the while recording everything between the two parentheses into contents list
+	# THEN
+	# If length of contents is 1, then set nameIter to zero and return the contents
+	# Return contents at nameIter, then increment nameIter
+	# BUT only return contents if it's not a literal string
+	# TODO Use vars in case of multiple args to be handled differently
 
-	return None
+	# print(call)
+	checked = 0
+	starts = []
+	while len(call[checked:]) > 0:
+		match = re.search(rf"{fName}\s*\(", call[checked:])
+		if match:
+			# print(match)
+			checked += match.end()
+			starts.append(checked)
+		else:
+			checked += 1
+
+	global nameIter
+	start = starts[nameIter]
+	if len(starts) > 1 and nameIter < len(starts) - 1:
+		nameIter += 1
+	else:
+		nameIter = 0
+
+	level = 0
+	varName = ""
+	for c in call[start:].strip():
+		if c == "(":
+			level += 1
+			varName += c
+		elif c == ")":
+			level -= 1
+			varName += c
+			if level <= 0:
+				break
+		else:
+			varName += c
+
+	if not varName.startswith(('"', "'", 'f"', "f'")):
+		return varName
 
 
 # ==================================================================================================
@@ -300,12 +334,14 @@ if __name__ == "__main__":
 	# setup_logger(useEq=False)
 
 	debug("hello")
+	s = "world"
+	debug(s)
 	d = {"a": 23, "nope": False}
 	debug(d)
-	info(d, True)
-	warning(True); error(False)
+	debug(d, True)
+	debug(True); info(False)
 	debug(True); debug(False)
-	critical(True)
+	debug(True)
 	a, b = 2, 2
 	c = 2
 	debug(a)
@@ -314,5 +350,12 @@ if __name__ == "__main__":
 	debug(None)
 	debug(f"ok: {True}")
 	# TODO FIX
-	debug(f"ok: {True}", c)
-	debug(c, f"ok: {True}")
+	error(f"ok: {True}", c)
+	error(c, f"ok: {True}")
+	error(tuple(list((1, 2, 3))))
+	error(
+		"testing"+
+		"ok"
+	)
+	error()
+	error("hello" + s + "ok")
