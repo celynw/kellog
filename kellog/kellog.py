@@ -324,7 +324,7 @@ def force_to_string(*args: Any) -> str:
 		msg = str(args[0])
 	if (len(args) > 1):
 		for arg in args[1:]:
-			msg += f" {str(arg)}"
+			msg += f", {str(arg)}"
 
 	return msg
 
