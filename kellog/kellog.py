@@ -104,7 +104,8 @@ def retrieve_name(vars):
 			varName += c
 		elif c == ")":
 			level -= 1
-			varName += c
+			if level == 0:
+				varName += c
 			if level <= 0:
 				break
 		else:
