@@ -32,7 +32,8 @@ def setup_logger(filePath: Path = None, name: str = "kellog", reset: bool = Fals
 	"""
 	global loggerName, ready, useEq_
 	loggerName = name
-	useEq_ = useEq
+	import __main__ as main
+	useEq_ = useEq and hasattr(main, "__file__") # Disable for interactive session
 
 	if reset:
 		open(filePath, "w").close() # Delete contents
