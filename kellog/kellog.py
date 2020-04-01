@@ -65,7 +65,13 @@ def retrieve_name(var):
 	fName = inspect.currentframe().f_back.f_code.co_name
 	call = inspect.getframeinfo(inspect.currentframe().f_back.f_back).code_context[0].strip()
 
-	return re.findall(rf"{fName}[^(]*\(([^)]*)\)", call)
+	varName = re.findall(rf"{fName}[^(]*\(([^)]*)\)", call)
+	if varName:
+		varName = varName[0]
+		if not varName.startswith(('f"', "f'")):
+			return varName
+
+	return None
 
 
 # ==================================================================================================
@@ -82,8 +88,8 @@ def debug(*args: Any):
 
 	extra = None
 	if useEq_:
-		varNames = retrieve_name(args)
-		extra = {"varName": varNames[0]} if len(varNames) == 1 else extra
+		varName = retrieve_name(args)
+		extra = {"varName": varName} if varName else extra
 	logger.debug(force_to_string(*args), extra=extra)
 
 
@@ -101,8 +107,8 @@ def info(*args: str):
 
 	extra = None
 	if useEq_:
-		varNames = retrieve_name(args)
-		extra = {"varName": varNames[0]} if len(varNames) == 1 else extra
+		varName = retrieve_name(args)
+		extra = {"varName": varName} if varName else extra
 	logger.info(force_to_string(*args), extra=extra)
 
 
@@ -120,8 +126,8 @@ def warning(*args: str):
 
 	extra = None
 	if useEq_:
-		varNames = retrieve_name(args)
-		extra = {"varName": varNames[0]} if len(varNames) == 1 else extra
+		varName = retrieve_name(args)
+		extra = {"varName": varName} if varName else extra
 	logger.warning(force_to_string(*args), extra=extra)
 
 
@@ -139,8 +145,8 @@ def error(*args: str):
 
 	extra = None
 	if useEq_:
-		varNames = retrieve_name(args)
-		extra = {"varName": varNames[0]} if len(varNames) == 1 else extra
+		varName = retrieve_name(args)
+		extra = {"varName": varName} if varName else extra
 	logger.error(force_to_string(*args), extra=extra)
 
 
@@ -158,8 +164,8 @@ def critical(*args: Any):
 
 	extra = None
 	if useEq_:
-		varNames = retrieve_name(args)
-		extra = {"varName": varNames[0]} if len(varNames) == 1 else extra
+		varName = retrieve_name(args)
+		extra = {"varName": varName} if varName else extra
 	logger.critical(force_to_string(*args), extra=extra)
 
 
@@ -299,3 +305,4 @@ if __name__ == "__main__":
 	debug(c)
 	debug(a, b, c)
 	debug(None)
+	debug(f"ok: {True}")
