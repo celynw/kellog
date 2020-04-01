@@ -68,7 +68,7 @@ def retrieve_name(var):
 	varName = re.findall(rf"{fName}[^(]*\(([^)]*)\)", call)
 	if varName:
 		varName = varName[0]
-		if not varName.startswith(('f"', "f'")):
+		if not varName.startswith(('"', "'", 'f"', "f'")):
 			return varName
 
 	return None
@@ -293,6 +293,7 @@ def force_to_string(*args: Any) -> str:
 if __name__ == "__main__":
 	# setup_logger(useEq=False)
 
+	debug("hello")
 	d = {"a": 23, "nope": False}
 	debug(d)
 	info(d, True)
@@ -306,3 +307,6 @@ if __name__ == "__main__":
 	debug(a, b, c)
 	debug(None)
 	debug(f"ok: {True}")
+	# TODO FIX
+	debug(f"ok: {True}", c)
+	debug(c, f"ok: {True}")
