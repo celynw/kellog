@@ -18,6 +18,7 @@ import re
 loggerName = "kellog"
 ready = False
 useEq_ = True
+nameIter = 0
 
 # ==================================================================================================
 def setup_logger(filePath: Path = None, name: str = "kellog", reset: bool = False, useEq: bool = True):
@@ -65,9 +66,14 @@ def retrieve_name(var):
 	fName = inspect.currentframe().f_back.f_code.co_name
 	call = inspect.getframeinfo(inspect.currentframe().f_back.f_back).code_context[0].strip()
 
-	varName = re.findall(rf"{fName}[^(]*\(([^)]*)\)", call)
-	if varName:
-		varName = varName[0]
+	varNames = re.findall(rf"{fName}[^(]*\(([^)]*)\)", call)
+	if varNames:
+		global nameIter
+		varName = varNames[nameIter]
+		if len(varNames) > 1 and nameIter < len(varNames) - 1:
+			nameIter += 1
+		else:
+			nameIter = 0
 		if not varName.startswith(('"', "'", 'f"', "f'")):
 			return varName
 
