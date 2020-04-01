@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import sys
 assert sys.version_info >= (3, 6) # For f-strings
 del sys
@@ -11,12 +12,15 @@ import subprocess
 import argparse
 import ujson
 from sys import stdout
+import inspect
+import re
 
 loggerName = "kellog"
 ready = False
+useEq_ = True
 
 # ==================================================================================================
-def setup_logger(filePath: Path=None, name: str="kellog", reset: bool=False):
+def setup_logger(filePath: Path = None, name: str = "kellog", reset: bool = False, useEq: bool = True):
 	"""
 	Set up logger to also log to a file.
 
@@ -24,9 +28,11 @@ def setup_logger(filePath: Path=None, name: str="kellog", reset: bool=False):
 		filePath (Path, optional): Output file. Defaults to None.
 		name (str, optional): Reset the logger name to this. Defaults to "kellog".
 		reset (bool, optional): Delete the contents of `filePath` first. Defaults to False.
+		useEq (bool, optional: Prefix the result with the variable name, if possible. Defaults to True.
 	"""
-	global loggerName, ready
+	global loggerName, ready, useEq_
 	loggerName = name
+	useEq_ = useEq
 
 	if reset:
 		open(filePath, "w").close() # Delete contents
@@ -53,6 +59,15 @@ def setup_logger(filePath: Path=None, name: str="kellog", reset: bool=False):
 
 
 # ==================================================================================================
+def retrieve_name(var):
+	# Get code which called kellog function
+	fName = inspect.currentframe().f_back.f_code.co_name
+	call = inspect.getframeinfo(inspect.currentframe().f_back.f_back).code_context[0].strip()
+
+	return re.findall(rf"{fName}[^(]*\(([^)]*)\)", call)
+
+
+# ==================================================================================================
 def debug(*args: Any):
 	"""
 	Output a debug message (green).
@@ -63,7 +78,12 @@ def debug(*args: Any):
 	if not ready:
 		setup_logger(name="kellog")
 	logger = logging.getLogger(loggerName)
-	logger.debug(force_to_string(*args))
+
+	extra = None
+	if useEq_:
+		varNames = retrieve_name(args)
+		extra = {"varName": varNames[0]} if len(varNames) == 1 else extra
+	logger.debug(force_to_string(*args), extra=extra)
 
 
 # ==================================================================================================
@@ -77,7 +97,12 @@ def info(*args: str):
 	if not ready:
 		setup_logger(name="kellog")
 	logger = logging.getLogger(loggerName)
-	logger.info(force_to_string(*args))
+
+	extra = None
+	if useEq_:
+		varNames = retrieve_name(args)
+		extra = {"varName": varNames[0]} if len(varNames) == 1 else extra
+	logger.info(force_to_string(*args), extra=extra)
 
 
 # ==================================================================================================
@@ -91,7 +116,12 @@ def warning(*args: str):
 	if not ready:
 		setup_logger(name="kellog")
 	logger = logging.getLogger(loggerName)
-	logger.warning(force_to_string(*args))
+
+	extra = None
+	if useEq_:
+		varNames = retrieve_name(args)
+		extra = {"varName": varNames[0]} if len(varNames) == 1 else extra
+	logger.warning(force_to_string(*args), extra=extra)
 
 
 # ==================================================================================================
@@ -105,7 +135,12 @@ def error(*args: str):
 	if not ready:
 		setup_logger(name="kellog")
 	logger = logging.getLogger(loggerName)
-	logger.error(force_to_string(*args))
+
+	extra = None
+	if useEq_:
+		varNames = retrieve_name(args)
+		extra = {"varName": varNames[0]} if len(varNames) == 1 else extra
+	logger.error(force_to_string(*args), extra=extra)
 
 
 # ==================================================================================================
@@ -119,11 +154,16 @@ def critical(*args: Any):
 	if not ready:
 		setup_logger(name="kellog")
 	logger = logging.getLogger(loggerName)
-	logger.critical(force_to_string(*args))
+
+	extra = None
+	if useEq_:
+		varNames = retrieve_name(args)
+		extra = {"varName": varNames[0]} if len(varNames) == 1 else extra
+	logger.critical(force_to_string(*args), extra=extra)
 
 
 # ==================================================================================================
-def git_rev(log: Callable=info):
+def git_rev(log: Callable = info):
 	"""
 	Print out the git revision (short hash).
 
@@ -140,7 +180,7 @@ def git_rev(log: Callable=info):
 
 
 # ==================================================================================================
-def write_args(args: argparse.Namespace, filePath: Path=Path("args.json"), log: Callable=info):
+def write_args(args: argparse.Namespace, filePath: Path = Path("args.json"), log: Callable = info):
 	"""
 	Print the argparse arguments in a nice list, and optionally saves to file.
 
@@ -164,11 +204,38 @@ def write_args(args: argparse.Namespace, filePath: Path=Path("args.json"), log: 
 
 
 # ==================================================================================================
-class ColouredFormatter(logging.Formatter):
+class NamingFormatter(logging.Formatter):
 	# ----------------------------------------------------------------------------------------------
-	def __init__(self, msg: str):
-		super().__init__(msg)
+	def format(self, record: logging.LogRecord, varNamePrefix="", varNameSuffix="") -> str:
+		"""
+		Handles f-string automatic naming for inherited classes.
+		Includes spaces around the operator.
 
+		Args:
+			record (logging.LogRecord): Log object
+
+		Returns:
+			str: Formatted output
+		"""
+		if (record.levelname == "DEBUG"):
+			record.levelname = "[DEBG]"
+		elif (record.levelname == "INFO"):
+			record.levelname = "[INFO]"
+		elif (record.levelname == "WARNING"):
+			record.levelname = "[WARN]"
+		elif (record.levelname == "ERROR"):
+			record.levelname = "[ERR!]"
+		elif (record.levelname == "CRITICAL"):
+			record.levelname = "[CRIT]"
+
+		if hasattr(record, "varName"):
+			record.msg = f"{varNamePrefix}{record.varName}{colorama.Style.RESET_ALL} = {varNameSuffix}{record.msg}"
+
+		return super().format(record)
+
+
+# ==================================================================================================
+class ColouredFormatter(NamingFormatter):
 	# ----------------------------------------------------------------------------------------------
 	def format(self, record: logging.LogRecord) -> str:
 		"""
@@ -182,24 +249,19 @@ class ColouredFormatter(logging.Formatter):
 		"""
 		if (record.levelname == "DEBUG"):
 			prefix = colorama.Fore.GREEN
-			record.levelname = "[DEBG]"
 		elif (record.levelname == "INFO"):
 			prefix = colorama.Fore.WHITE
-			record.levelname = "[INFO]"
 		elif (record.levelname == "WARNING"):
 			prefix = colorama.Fore.YELLOW
-			record.levelname = "[WARN]"
 		elif (record.levelname == "ERROR"):
 			prefix = colorama.Fore.RED
-			record.levelname = "[ERR!]"
 		elif (record.levelname == "CRITICAL"):
 			prefix = colorama.Fore.RED + colorama.Style.BRIGHT
-			record.levelname = "[CRIT]"
 		else:
 			prefix = ""
 		suffix = colorama.Style.RESET_ALL
 
-		return prefix + super().format(record) + suffix
+		return f"{prefix}{super().format(record, varNamePrefix=colorama.Fore.MAGENTA, varNameSuffix=prefix)}{suffix}"
 
 
 # ==================================================================================================
@@ -218,3 +280,21 @@ def force_to_string(*args: Any) -> str:
 			msg += f" {str(arg)}"
 
 	return msg
+
+
+# ==================================================================================================
+if __name__ == "__main__":
+	# setup_logger(useEq=False)
+
+	d = {"a": 23, "nope": False}
+	debug(d)
+	info(d, True)
+	warning(True); error(False)
+	debug(True); debug(False)
+	critical(True)
+	a, b = 2, 2
+	c = 2
+	debug(a)
+	debug(c)
+	debug(a, b, c)
+	debug(None)
