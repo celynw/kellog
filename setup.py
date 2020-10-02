@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
 	name="kellog",
-	version="0.1",
+	version="0.1.0",
 	description="Easy logging",
 	author="Celyn Walters",
 	url="https://github.com/celynwalters/kellog",
