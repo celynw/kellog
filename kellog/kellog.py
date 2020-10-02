@@ -124,23 +124,6 @@ def critical(*args: Any):
 
 
 # ==================================================================================================
-def git_rev(log: Callable=info):
-	"""
-	Print out the git revision (short hash).
-
-	Args:
-		log (Callable, optional): Logging/printing function to use. Defaults to info.
-	"""
-	cwd = Path(inspect.stack()[1][1]).parent
-	try:
-		output = str(subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], stderr=subprocess.STDOUT, universal_newlines=True, cwd=cwd)).strip()
-	except subprocess.CalledProcessError as exc:
-		error(exc.output)
-	else:
-		log("Git revision:", output)
-
-
-# ==================================================================================================
 def write_args(args: argparse.Namespace, filePath: Path=Path("args.json"), log: Callable=info):
 	"""
 	Print the argparse arguments in a nice list, and optionally saves to file.
