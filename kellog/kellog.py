@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import sys
 assert sys.version_info >= (3, 6) # For f-strings
 del sys
