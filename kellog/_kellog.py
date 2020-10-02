@@ -124,7 +124,7 @@ def critical(*args: Any):
 
 
 # ==================================================================================================
-def write_args(args: argparse.Namespace, filePath: Path=Path("args.json"), log: Callable=info):
+def log_args(args: argparse.Namespace, filePath: Path=Path("args.json"), log: Callable=info):
 	"""
 	Print the argparse arguments in a nice list, and optionally saves to file.
 
