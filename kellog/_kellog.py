@@ -7,8 +7,6 @@ from typing import Any, Callable
 import logging
 import colorama
 from pathlib import Path
-import inspect
-import subprocess
 import argparse
 import ujson
 from sys import stdout
