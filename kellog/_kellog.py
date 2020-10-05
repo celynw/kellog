@@ -3,19 +3,26 @@ import sys
 assert sys.version_info >= (3, 6) # For f-strings
 del sys
 
-from typing import Any, Callable
 import logging
 import colorama
 from pathlib import Path
 import argparse
 import ujson
+from munch import Munch
 from sys import stdout
+from typing import Any, Callable, Union, Dict, Optional
 
 loggerName = "kellog"
 ready = False
 
 # ==================================================================================================
-def setup_logger(filePath: Path=None, name: str="kellog", reset: bool=False):
+def setup_logger(filePath: Optional[Path] = None, name: str = "kellog", reset: bool = False,
+	prefixes: Union[Dict[str, str], Munch] = {
+		"debug": "[DEBG] ",
+		"info": "[INFO] ",
+		"warning": "[WARN] ",
+		"error": "[ERR!] ",
+		"critical": "[CRIT] "}):
 	"""
 	Set up logger to also log to a file.
 
@@ -23,6 +30,7 @@ def setup_logger(filePath: Path=None, name: str="kellog", reset: bool=False):
 		filePath (Path, optional): Output file. Defaults to None.
 		name (str, optional): Reset the logger name to this. Defaults to "kellog".
 		reset (bool, optional): Delete the contents of `filePath` first. Defaults to False.
+		prefixes (Union[Dict[str, str], Munch], optional): Set the log message prefixes. Does not automatically add separating whitespace.
 	"""
 	global loggerName, ready
 	loggerName = name
@@ -38,8 +46,8 @@ def setup_logger(filePath: Path=None, name: str="kellog", reset: bool=False):
 	logger.setLevel(logging.DEBUG)
 	ch = logging.StreamHandler(stream=stdout)
 	ch.setLevel(logging.DEBUG)
-	formatting = "%(levelname)s %(message)s"
-	ch.setFormatter(ColouredFormatter(formatting))
+	formatting = "%(levelname)s%(message)s"
+	ch.setFormatter(ColouredFormatter(formatting, prefixes))
 	logger.addHandler(ch)
 
 	if filePath:
@@ -149,8 +157,15 @@ def log_args(args: argparse.Namespace, filePath: Path = Path("args.json"), log: 
 # ==================================================================================================
 class ColouredFormatter(logging.Formatter):
 	# ----------------------------------------------------------------------------------------------
-	def __init__(self, msg: str):
+	def __init__(self, msg: str, prefixes: Union[Dict[str, str], Munch] = {
+		"debug": "[DEBG] ",
+		"info": "[INFO] ",
+		"warning": "[WARN] ",
+		"error": "[ERR!] ",
+		"critical": "[CRIT] "}
+	):
 		super().__init__(msg)
+		self.prefixes = Munch(prefixes)
 
 	# ----------------------------------------------------------------------------------------------
 	def format(self, record: logging.LogRecord) -> str:
@@ -165,19 +180,19 @@ class ColouredFormatter(logging.Formatter):
 		"""
 		if (record.levelname == "DEBUG"):
 			prefix = colorama.Fore.GREEN
-			record.levelname = "[DEBG]"
+			record.levelname = self.prefixes.debug
 		elif (record.levelname == "INFO"):
 			prefix = colorama.Fore.WHITE
-			record.levelname = "[INFO]"
+			record.levelname = self.prefixes.info
 		elif (record.levelname == "WARNING"):
 			prefix = colorama.Fore.YELLOW
-			record.levelname = "[WARN]"
+			record.levelname = self.prefixes.warning
 		elif (record.levelname == "ERROR"):
 			prefix = colorama.Fore.RED
-			record.levelname = "[ERR!]"
+			record.levelname = self.prefixes.error
 		elif (record.levelname == "CRITICAL"):
 			prefix = colorama.Fore.RED + colorama.Style.BRIGHT
-			record.levelname = "[CRIT]"
+			record.levelname = self.prefixes.critical
 		else:
 			prefix = ""
 		suffix = colorama.Style.RESET_ALL
@@ -201,3 +216,20 @@ def force_to_string(*args: Any) -> str:
 			msg += f" {str(arg)}"
 
 	return msg
+
+
+# ==================================================================================================
+if __name__ == "__main__":
+	setup_logger()
+	# setup_logger(prefixes={
+	# 	"debug": "[D] ",
+	# 	"info": "[I] ",
+	# 	"warning": "[W] ",
+	# 	"error": "[E] ",
+	# 	"critical": "[C] "
+	# })
+	debug("Debug")
+	info("Info")
+	warning("Warning")
+	error("Error")
+	critical("Critical")

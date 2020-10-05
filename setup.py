@@ -8,6 +8,6 @@ setup(
 	author="Celyn Walters",
 	url="https://github.com/celynwalters/kellog",
 	packages=["kellog"],
-	install_requires=["colorama", "ujson"],
+	install_requires=["colorama", "ujson", "munch"],
 	python_requires=">=3.6",
 )

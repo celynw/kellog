@@ -35,6 +35,7 @@ error("Exception")
 - `filePath`: If specified, also write the log messages to this file.
 - `name`: Set name of `logging` logger.
 - `reset`: Delete the contents of `filePath` first.
+- `prefixes`: Set message prefixes for each log level.
 
 ### log_args
 
