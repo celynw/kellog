@@ -66,7 +66,7 @@ def debug(*args: Any):
 
 
 # ==================================================================================================
-def info(*args: str):
+def info(*args: Any):
 	"""
 	Output an info message (grey).
 
@@ -80,7 +80,7 @@ def info(*args: str):
 
 
 # ==================================================================================================
-def warning(*args: str):
+def warning(*args: Any):
 	"""
 	Output a warning message (orange).
 
@@ -94,7 +94,7 @@ def warning(*args: str):
 
 
 # ==================================================================================================
-def error(*args: str):
+def error(*args: Any):
 	"""
 	Output an error message (red).
 
@@ -122,7 +122,7 @@ def critical(*args: Any):
 
 
 # ==================================================================================================
-def log_args(args: argparse.Namespace, filePath: Path=Path("args.json"), log: Callable=info):
+def log_args(args: argparse.Namespace, filePath: Path = Path("args.json"), log: Callable = info):
 	"""
 	Print the argparse arguments in a nice list, and optionally saves to file.
 
@@ -142,7 +142,8 @@ def log_args(args: argparse.Namespace, filePath: Path=Path("args.json"), log: Ca
 		for k, v in argsDict.items():
 			argsDict[k] = str(v) if not isinstance(v, (str, float, int, bool)) else v
 		with open(filePath, "w") as file:
-			ujson.dump(argsDict, file, indent=2, ensure_ascii=False, escape_forward_slashes=False, sort_keys=False)
+			ujson.dump(argsDict, file, indent=2, ensure_ascii=False, escape_forward_slashes=False,
+				sort_keys=False)
 
 
 # ==================================================================================================
