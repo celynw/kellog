@@ -6,7 +6,7 @@ setup(
 	version="0.1.0",
 	description="Easy logging",
 	author="Celyn Walters",
-	url="https://github.com/celynwalters/kellog",
+	url="https://github.com/celynw/kellog",
 	packages=["kellog"],
 	install_requires=["colorama", "ujson", "munch"],
 	python_requires=">=3.6",
