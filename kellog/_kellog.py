@@ -157,13 +157,7 @@ def log_args(args: argparse.Namespace, filePath: Path = Path("args.json"), log: 
 # ==================================================================================================
 class ColouredFormatter(logging.Formatter):
 	# ----------------------------------------------------------------------------------------------
-	def __init__(self, msg: str, prefixes: Union[Dict[str, str], Munch] = {
-		"debug": "[DEBG] ",
-		"info": "[INFO] ",
-		"warning": "[WARN] ",
-		"error": "[ERR!] ",
-		"critical": "[CRIT] "}
-	):
+	def __init__(self, msg: str, prefixes: Union[Dict[str, str], Munch]):
 		super().__init__(msg)
 		self.prefixes = Munch(prefixes)
 
