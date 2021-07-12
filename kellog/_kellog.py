@@ -35,7 +35,7 @@ def setup_logger(filePath: Optional[Path] = None, name: str = "kellog", reset: b
 	global loggerName, ready
 	loggerName = name
 
-	if reset:
+	if reset and filePath is not None:
 		open(filePath, "w").close() # Delete contents
 
 	logger = logging.getLogger(loggerName)
