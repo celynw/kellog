@@ -16,13 +16,17 @@ loggerName = "kellog"
 ready = False
 
 # ==================================================================================================
-def setup_logger(filePath: Optional[Path] = None, name: str = "kellog", reset: bool = False,
+def setup_logger(
+	filePath: Optional[Path] = None,
+	name: str = "kellog",
+	reset: bool = False,
 	prefixes: Union[Dict[str, str], Munch] = {
-		"debug": "[DEBG] ",
-		"info": "[INFO] ",
-		"warning": "[WARN] ",
-		"error": "[ERR!] ",
-		"critical": "[CRIT] "}):
+		"debug": " ",
+		"info": " ",
+		"warning": " ",
+		"error": "✖ ",
+		"critical": " "
+	}):
 	"""
 	Set up logger to also log to a file.
 
