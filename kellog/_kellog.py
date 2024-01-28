@@ -1,196 +1,52 @@
 #!/usr/bin/env python3
-import sys
-assert sys.version_info >= (3, 6) # For f-strings
-del sys
+from __future__ import annotations
 
 import logging
-import colorama
 from pathlib import Path
-import argparse
-import ujson
-from munch import Munch
 from sys import stdout
-from typing import Any, Callable, Union, Dict, Optional
+from typing import TYPE_CHECKING, Any, Callable
 
-loggerName = "kellog"
-ready = False
+import colorama
+import ujson
+from typing_extensions import Self
 
-# ==================================================================================================
-def setup_logger(
-	filePath: Optional[Path] = None,
-	name: str = "kellog",
-	reset: bool = False,
-	prefixes: Union[Dict[str, str], Munch] = {
-		"debug": " ",
-		"info": " ",
-		"warning": " ",
-		"error": "✖ ",
-		"critical": " "
-	}):
-	"""
-	Set up logger to also log to a file.
-
-	Args:
-		filePath (Path, optional): Output file. Defaults to None.
-		name (str, optional): Reset the logger name to this. Defaults to "kellog".
-		reset (bool, optional): Delete the contents of `filePath` first. Defaults to False.
-		prefixes (Union[Dict[str, str], Munch], optional): Set the log message prefixes. Does not automatically add separating whitespace.
-	"""
-	global loggerName, ready
-	loggerName = name
-
-	if reset and filePath is not None:
-		open(filePath, "w").close() # Delete contents
-
-	logger = logging.getLogger(loggerName)
-	logger.propagate = False
-	if logger:
-		logger.handlers = []
-	logger = logging.getLogger(loggerName)
-	logger.setLevel(logging.DEBUG)
-	ch = logging.StreamHandler(stream=stdout)
-	ch.setLevel(logging.DEBUG)
-	formatting = "%(levelname)s%(message)s"
-	ch.setFormatter(ColouredFormatter(formatting, prefixes))
-	logger.addHandler(ch)
-
-	if filePath:
-		fh = logging.FileHandler(filePath)
-		fh.setLevel(logging.DEBUG)
-		fh.setFormatter(logging.Formatter(formatting))
-		logger.addHandler(fh)
-
-	ready = True
+if TYPE_CHECKING:
+	import argparse
 
 
-# ==================================================================================================
-def debug(*args: Any):
-	"""
-	Output a debug message (green).
-
-	Args:
-		*args (Any): Will be converted to a string using its __str__.
-	"""
-	if not ready:
-		setup_logger(name="kellog")
-	logger = logging.getLogger(loggerName)
-	logger.debug(force_to_string(*args))
-
-
-# ==================================================================================================
-def info(*args: Any):
-	"""
-	Output an info message (grey).
-
-	Args:
-		*args (Any): Will be converted to a string using its __str__.
-	"""
-	if not ready:
-		setup_logger(name="kellog")
-	logger = logging.getLogger(loggerName)
-	logger.info(force_to_string(*args))
-
-
-# ==================================================================================================
-def warning(*args: Any):
-	"""
-	Output a warning message (orange).
-
-	Args:
-		*args (Any): Will be converted to a string using its __str__.
-	"""
-	if not ready:
-		setup_logger(name="kellog")
-	logger = logging.getLogger(loggerName)
-	logger.warning(force_to_string(*args))
-
-
-# ==================================================================================================
-def error(*args: Any):
-	"""
-	Output an error message (red).
-
-	Args:
-		*args (Any): Will be converted to a string using its __str__.
-	"""
-	if not ready:
-		setup_logger(name="kellog")
-	logger = logging.getLogger(loggerName)
-	logger.error(force_to_string(*args))
-
-
-# ==================================================================================================
-def critical(*args: Any):
-	"""
-	Output a critical message (bright red).
-
-	Args:
-		*args (Any): Will be converted to a string using its __str__.
-	"""
-	if not ready:
-		setup_logger(name="kellog")
-	logger = logging.getLogger(loggerName)
-	logger.critical(force_to_string(*args))
-
-
-# ==================================================================================================
-def log_args(args: argparse.Namespace, filePath: Path = Path("args.json"), log: Callable = info):
-	"""
-	Print the argparse arguments in a nice list, and optionally saves to file.
-
-	Args:
-		args (argparse.Namespace): Input arguments from `parser.parse_args()`
-		filePath (Path, optional): Path to save the arguments to. Defaults to Path("args.json").
-		log (Callable, optional): Logging/printing function to use. Defaults to info.
-	"""
-	argsDict = args.__dict__.copy()
-	if log:
-		import __main__ as main
-		log(f"Main script: {main.__file__}")
-		log("Arguments: ")
-		for k, v in argsDict.items():
-			log(f"  {k}: {v}")
-	if filePath is not None:
-		for k, v in argsDict.items():
-			argsDict[k] = str(v) if not isinstance(v, (str, float, int, bool)) else v
-		with open(filePath, "w") as file:
-			ujson.dump(argsDict, file, indent=2, ensure_ascii=False, escape_forward_slashes=False,
-				sort_keys=False)
-
-
-# ==================================================================================================
 class ColouredFormatter(logging.Formatter):
-	# ----------------------------------------------------------------------------------------------
-	def __init__(self, msg: str, prefixes: Union[Dict[str, str], Munch]):
+	def __init__(self: Self, msg: str, prefixes: dict[str, str]) -> None:
 		super().__init__(msg)
-		self.prefixes = Munch(prefixes)
+		self.prefixes = prefixes
 
-	# ----------------------------------------------------------------------------------------------
-	def format(self, record: logging.LogRecord) -> str:
+	def format(self: Self, record: logging.LogRecord) -> str:
 		"""
 		Prefixes with the logging level and assigns a colour.
 
-		Args:
-			record (logging.LogRecord): Log object
+		Parameters
+		----------
+		record
+			Log object
 
-		Returns:
-			str: Formatted output
+		Returns
+		-------
+			Formatted output
 		"""
-		if (record.levelname == "DEBUG"):
+		if record.levelname == "DEBUG":
 			prefix = colorama.Fore.GREEN
-			record.levelname = self.prefixes.debug
-		elif (record.levelname == "INFO"):
+			record.levelname = self.prefixes["debug"]
+		elif record.levelname == "INFO":
 			prefix = colorama.Fore.WHITE
-			record.levelname = self.prefixes.info
-		elif (record.levelname == "WARNING"):
+			record.levelname = self.prefixes["info"]
+		elif record.levelname == "WARNING":
 			prefix = colorama.Fore.YELLOW
-			record.levelname = self.prefixes.warning
-		elif (record.levelname == "ERROR"):
+			record.levelname = self.prefixes["warning"]
+		elif record.levelname == "ERROR":
 			prefix = colorama.Fore.RED
-			record.levelname = self.prefixes.error
-		elif (record.levelname == "CRITICAL"):
+			record.levelname = self.prefixes["error"]
+		elif record.levelname == "CRITICAL":
 			prefix = colorama.Fore.RED + colorama.Style.BRIGHT
-			record.levelname = self.prefixes.critical
+			record.levelname = self.prefixes["critical"]
 		else:
 			prefix = ""
 		suffix = colorama.Style.RESET_ALL
@@ -198,34 +54,174 @@ class ColouredFormatter(logging.Formatter):
 		return prefix + super().format(record) + suffix
 
 
-# ==================================================================================================
-def force_to_string(*args: Any) -> str:
-	"""
-	Force the input to be a string.
+class Kellog:
+	_instance: Self = None  # type: ignore[attr-defined]
 
-	Returns:
-		str: Output
-	"""
-	msg = ""
-	if (len(args) > 0):
-		msg = str(args[0])
-	if (len(args) > 1):
-		for arg in args[1:]:
-			msg += f" {str(arg)}"
+	def __new__(cls: type[Self], *args: tuple[Any], **kwargs: Any) -> Self:
+		if cls._instance is None:
+			cls._instance = super().__new__(cls, *args, **kwargs)
 
-	return msg
+		return cls._instance
+
+	def __init__(
+		self: Self,
+		*,
+		path: Path | None = None,
+		name: str = "kellog",
+		prefixes: dict[str, str] | None = None,
+		append: bool = True,
+	) -> None:
+		"""
+		Initialise the logger.
+
+		Parameters
+		----------
+		path, optional
+			Output file, by default `None`
+		name, optional
+			Reset the logger name to this, by default `"kellog"`
+		prefixes, optional
+			Set the log message prefixes (does not automatically add separating whitespace), by default `None`.
+			The dictionary keys to set are "debug", "info", "warning", "error", "critical".
+			Setting to None will use the default unicode prefixes, from codicons:      .
+		append, optional
+			If False, delete the contents of `path` first, by default `True`
+		"""
+		if prefixes is None:
+			prefixes = {
+				"debug": " ",
+				"info": " ",
+				"warning": " ",
+				"error": " ",
+				"critical": " ",
+			}
+
+		self.path = path
+		self.name = name
+		self.append = append
+
+		if not append and path is not None:
+			path.open("w").close()  # Delete contents
+
+		logger = logging.getLogger(self.name)
+		logger.propagate = False
+		if logger:
+			logger.handlers = []
+		self.logger = logging.getLogger(self.name)
+		self.logger.setLevel(logging.DEBUG)
+		ch = logging.StreamHandler(stream=stdout)
+		ch.setLevel(logging.DEBUG)
+		formatting = "%(levelname)s%(message)s"
+		ch.setFormatter(ColouredFormatter(formatting, prefixes))
+		self.logger.addHandler(ch)
+
+		if path:
+			fh = logging.FileHandler(path)
+			fh.setLevel(logging.DEBUG)
+			fh.setFormatter(logging.Formatter(formatting))
+			self.logger.addHandler(fh)
+
+	def _maybe_add_newline(self: Self) -> None:
+		if self.path is not None and self.append and self.path.exists() and self.path.stat().st_size > 0:
+			with self.path.open("a") as f:
+				f.write("\n")
+
+	def debug(self: Self, *args: Any) -> None:
+		self._maybe_add_newline()
+		self.logger.debug(self._force_to_string(*args))
+
+	def info(self: Self, *args: Any) -> None:
+		self._maybe_add_newline()
+		self.logger.info(self._force_to_string(*args))
+
+	def warning(self: Self, *args: Any) -> None:
+		self._maybe_add_newline()
+		self.logger.warning(self._force_to_string(*args))
+
+	def error(self: Self, *args: Any) -> None:
+		self._maybe_add_newline()
+		self.logger.error(self._force_to_string(*args))
+
+	def critical(self: Self, *args: Any) -> None:
+		self._maybe_add_newline()
+		self.logger.critical(self._force_to_string(*args))
+
+	@staticmethod
+	def _force_to_string(*args: Any) -> str:
+		"""
+		Force the input to be a string.
+
+		Returns
+		-------
+			Output as string
+		"""
+		msg = ""
+		if len(args) > 0:
+			msg = str(args[0])
+		if len(args) > 1:
+			for arg in args[1:]:
+				msg += f" {arg}"
+
+		return msg
+
+	@staticmethod
+	def log_args(args: argparse.Namespace, path: Path = Path("args.json"), log: Callable = info) -> None:
+		"""
+		Print the argparse arguments in a nice list, and optionally saves to file.
+
+		Parameters
+		----------
+		args
+			Input arguments from `parser.parse_args()`
+		path, optional
+			Path of JSON file to save the arguments to, by default `Path("args.json")`
+		log, optional
+			Logging/printing function to use, by default `Kellog.info`
+		"""
+		args_dict = args.__dict__.copy()
+		if log:
+			import __main__ as main
+
+			log(f"Main script: {main.__file__}")
+			log("Arguments: ")
+			for k, v in args_dict.items():
+				log(f"  {k}: {v}")
+		if path is not None:
+			for k, v in args_dict.items():
+				args_dict[k] = str(v) if not isinstance(v, (str, float, int, bool)) else v
+			with path.open("w") as file:
+				ujson.dump(args_dict, file, indent=2, ensure_ascii=False, escape_forward_slashes=False, sort_keys=False)
 
 
-# ==================================================================================================
+# Automatically instantiate the singleton class when this module is imported
+kellog = Kellog()
+
+
+def debug(*args: Any) -> None:
+	kellog.debug(*args)
+
+
+def info(*args: Any) -> None:
+	kellog.info(*args)
+
+
+def warning(*args: Any) -> None:
+	kellog.warning(*args)
+
+
+def error(*args: Any) -> None:
+	kellog.error(*args)
+
+
+def critical(*args: Any) -> None:
+	kellog.critical(*args)
+
+
+def log_args(args: argparse.Namespace, path: Path = Path("args.json"), log: Callable = info) -> None:
+	kellog.log_args(args, path, log)
+
+
 if __name__ == "__main__":
-	setup_logger()
-	# setup_logger(prefixes={
-	# 	"debug": "[D] ",
-	# 	"info": "[I] ",
-	# 	"warning": "[W] ",
-	# 	"error": "[E] ",
-	# 	"critical": "[C] "
-	# })
 	debug("Debug")
 	info("Info")
 	warning("Warning")
