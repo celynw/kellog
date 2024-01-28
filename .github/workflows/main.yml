@@ -8,8 +8,16 @@ on:
       python-version:
         description: "Python version"
         required: true
-        type: string
-        default: "3.12"
+        type: choice
+        options:
+          - 3.6
+          - 3.7
+          - 3.8
+          - 3.9
+          - 3.10
+          - 3.11
+          - 3.12
+          - 3.13
 
 jobs:
   test:
