@@ -1,46 +1,64 @@
 # kellog
 
-Easy to use `print()` replacement with coloured output.
-It's a wrapper around `logging`, so it can also log to file.
+Extremely easy to use python `print()` replacement with coloured output and status icons.
 
 ## Installation
 
-```python
+```bash
 $ pip install kellog
 ```
 
+Requires python version 3.6 or above.
+
 ## Usage
 
-Standard usage example:
+It is very very simple to start using this right away:
 
 ```python
 from kellog import debug, info, warning, error, critical
 
 debug("Debug message")
->>> [DEBG] Debug message
 info(f"Five plus six is {5 + 6}")
->>> [INFO] Five plus six is 11
 warning("f-strings are better than", "comma-separated", "arguments")
->>> [WARN] f-strings are better than comma-separated arguments
 error("Exception")
->>> [ERR!] Exception
+critical("DEFCON 1")
 ```
 
-## Other options
+`kellog` wraps the built-in `logging` library, so it can be controlled in the same ways.
+For instance, logging to file and configuring the output format.
 
-### setup_logger
+```none
+class Kellog(
+	path: Path | None,
+	name: str,
+	prefixes: dict[str, str] | None,
+	append: bool,
+)
 
-`setup_logger(filePath: Path = None, name: str = "kellog", reset: bool = False)`
+Parameters
+----------
+path, optional
+  Output file, by default None
+name, optional
+  Reset the logger name to this, by default "kellog"
+prefixes, optional
+  Set the log message prefixes (does not automatically add separating whitespace), by default None.
+  The dictionary keys to set are "debug", "info", "warning", "error", "critical".
+  Setting to None will use the default unicode prefixes, from codicons:      .
+append, optional
+  If False, delete the contents of `path` first, by default True
+```
 
-- `filePath`: If specified, also write the log messages to this file.
-- `name`: Set name of `logging` logger.
-- `reset`: Delete the contents of `filePath` first.
-- `prefixes`: Set message prefixes for each log level.
+## Tests
 
-### log_args
+Install this package with:
 
-`log_args(args: argparse.Namespace, filePath: Path=Path("args.json"), log: Callable=info)`
+```bash
+pip install -e .[dev]
+```
 
-- `args`: Output of `argparse.parse_args()`.
-- `filePath`: If specified, also write the output in JSON format.
-- `log`: Which log function to use, e.g. `info`.
+Then run the tests:
+
+```bash
+make tests
+```
