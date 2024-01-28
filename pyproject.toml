@@ -1,0 +1,64 @@
+[project]
+name = "kellog"
+version = "0.2.0"
+description = "Easy logging"
+readme = "README.md"
+authors = [
+	{ name = "celynw", email = "3299161+celynw@users.noreply.github.com" },
+]
+license = { file = "LICENSE" }
+requires-python = ">=3.6"
+dependencies = ["colorama", "ujson", "munch"]
+keywords = ["log", "print", "color", "pretty"]
+classifiers = [
+	"Development Status :: 4 - Beta",
+	"Environment :: Console",
+	"Intended Audience :: Developers",
+	"License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+	"Natural Language :: English",
+	"Topic :: System :: Logging",
+	"Programming Language :: Python :: 3",
+	"Programming Language :: Python :: 3.6",
+	"Programming Language :: Python :: 3.7",
+	"Programming Language :: Python :: 3.8",
+	"Programming Language :: Python :: 3.9",
+	"Programming Language :: Python :: 3.10",
+	"Programming Language :: Python :: 3.11",
+	"Programming Language :: Python :: 3.12",
+	"Programming Language :: Python :: 3.13",
+]
+
+[project.urls]
+Repository = "https://github.com/celynw/kellog"
+Issues = "https://github.com/celynw/kellog/issues"
+Changelog = "https://github.com/celynw/kellog/blob/master/CHANGELOG.md"
+
+[project.optional-dependencies]
+dev = ["ruff", "mypy", "pytest", "colored_traceback"]
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+	"W191", # Indentation contains tabs
+	"D206", # Docstring should be indented with spaces, not tabs
+	"D212", # Multi-line docstring summary should start at the first line
+]
+unfixable = [
+	"F401", # Imported but unused
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "tab"
+
+[tool.ruff.lint.flake8-annotations]
+allow-star-arg-any = true
+
+[tool.ruff.lint.per-file-ignores]
+"**/{tests,docs,tools}/*" = [
+	"S101",   # Use of assert detected
+	"SLF001", # Private member accessed
+]
