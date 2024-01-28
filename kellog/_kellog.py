@@ -174,7 +174,8 @@ class Kellog:
 		args
 			Input arguments from `parser.parse_args()`
 		path, optional
-			Path of JSON file to save the arguments to, by default `Path("args.json")`
+			Path of JSON file to save the arguments to, by default `Path("args.json")`.
+			If `None`, don't write to file.
 		log, optional
 			Logging/printing function to use, by default `Kellog.info`
 		"""
