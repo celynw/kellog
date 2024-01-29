@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       python-version:
-        description: "Python version"
+        description: Python version
         required: true
         type: choice
         options:
@@ -37,7 +37,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install .[dev]
     - name: Unit tests
-      run: pytest --disable-warnings -vvs kellog/tests"
+      run: pytest --disable-warnings -vvs kellog/tests
 
   publish:
     name: Publish to PyPI
