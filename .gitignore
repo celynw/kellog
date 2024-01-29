@@ -3,3 +3,4 @@
 .vscode/
 dist/
 venv/
+args.json
