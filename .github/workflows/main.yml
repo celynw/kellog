@@ -69,9 +69,17 @@ jobs:
     needs: publish
     runs-on: ubuntu-latest
     steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
     - name: Get the version
       id: get_version
       run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
+    - name: Extract changelog
+      id: extract_changelog
+      run: |
+        VERSION=${{ steps.get_version.outputs.VERSION }}
+        CHANGELOG=$(awk -v version="$VERSION" '/^## /{p=0} $0 ~ "^## " version{p=1} p' CHANGELOG.md)
+        echo ::set-output name=CHANGELOG::"$CHANGELOG"
     - name: Create release
       id: create_release
       uses: actions/create-release@v1
@@ -80,5 +88,6 @@ jobs:
       with:
         tag_name: ${{ steps.get_version.outputs.VERSION }}
         release_name: Release ${{ steps.get_version.outputs.VERSION }}
+        body: ${{ steps.extract_changelog.outputs.CHANGELOG }}
         draft: true
         prerelease: false
