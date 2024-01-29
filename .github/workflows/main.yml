@@ -1,8 +1,10 @@
 name: kellog
 on:
   push:
+    branches:
+      - '**'
     tags:
-      - v*
+      - 'v*'
   workflow_dispatch:
     inputs:
       python-version:
