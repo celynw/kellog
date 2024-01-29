@@ -24,6 +24,8 @@ error("Exception")
 critical("DEFCON 1")
 ```
 
+![image](https://github.com/celynw/kellog/assets/3299161/3ddcfc4d-e8dd-44c3-ad8e-795e03b141cf)
+
 `kellog` wraps the built-in `logging` library, so it can be controlled in the same ways.
 For instance, logging to file and configuring the output format.
 
