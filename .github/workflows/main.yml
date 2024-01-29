@@ -78,8 +78,10 @@ jobs:
       id: extract_changelog
       run: |
         VERSION=${{ steps.get_version.outputs.VERSION }}
+        PREVIOUS_VERSION=$(git tag | sort -rV | sed -n '2p')
         CHANGELOG=$(awk -v version="$VERSION" '/^## /{p=0} $0 ~ "^## " version{p=1} p' CHANGELOG.md)
         echo ::set-output name=CHANGELOG::"$CHANGELOG"
+        echo ::set-output name=PREVIOUS_VERSION::"$PREVIOUS_VERSION"
     - name: Create release
       id: create_release
       uses: actions/create-release@v1
@@ -88,6 +90,8 @@ jobs:
       with:
         tag_name: ${{ steps.get_version.outputs.VERSION }}
         release_name: Release ${{ steps.get_version.outputs.VERSION }}
-        body: ${{ steps.extract_changelog.outputs.CHANGELOG }}
+        body: |
+          ${{ steps.extract_changelog.outputs.CHANGELOG }}
+          **Full Changelog**: https://github.com/celynw/kellog/compare/${{ steps.extract_changelog.outputs.PREVIOUS_VERSION }}...${{ steps.get_version.outputs.VERSION }}"
         draft: true
         prerelease: false
