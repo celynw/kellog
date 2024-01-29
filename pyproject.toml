@@ -62,3 +62,6 @@ allow-star-arg-any = true
 	"S101",   # Use of assert detected
 	"SLF001", # Private member accessed
 ]
+"__init__.py" = [
+	"F401", # Imported but unused
+]
