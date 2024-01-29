@@ -7,7 +7,7 @@ authors = [
 	{ name = "celynw", email = "3299161+celynw@users.noreply.github.com" },
 ]
 license = { file = "LICENSE" }
-requires-python = ">=3.6"
+requires-python = ">=3.7"
 dependencies = ["colorama", "ujson", "munch"]
 keywords = ["log", "print", "color", "pretty"]
 classifiers = [

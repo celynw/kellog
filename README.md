@@ -8,7 +8,7 @@ Extremely easy to use python `print()` replacement with coloured output and stat
 $ pip install kellog
 ```
 
-Requires python version 3.6 or above.
+Requires python version 3.7 or above.
 
 ## Usage
 
