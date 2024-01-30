@@ -5,7 +5,7 @@ Extremely easy to use python `print()` replacement with coloured output and stat
 ## Installation
 
 ```bash
-$ pip install kellog
+pip install kellog
 ```
 
 Requires python version 3.7 or above.
