@@ -52,15 +52,15 @@ jobs:
         fetch-tags: true
     - name: Get the version
       id: get_version
-      run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
+      run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
     - name: Extract changelog
       id: extract_changelog
       run: |
         VERSION=${{ steps.get_version.outputs.VERSION }}
         PREVIOUS_VERSION=$(git tag | sort -rV | sed -n '2p')
         CHANGELOG=$(awk -v version="$VERSION" '/^## /{p=0} $0 ~ "^## " version{p=1} p' CHANGELOG.md)
-        echo ::set-output name=CHANGELOG::"$CHANGELOG"
-        echo ::set-output name=PREVIOUS_VERSION::"$PREVIOUS_VERSION"
+        echo "CHANGELOG=$CHANGELOG" >> $GITHUB_OUTPUT
+        echo "PREVIOUS_VERSION=$PREVIOUS_VERSION" >> $GITHUB_OUTPUT
     - name: Create release
       id: create_release
       uses: actions/create-release@v1
