@@ -34,6 +34,9 @@ Changelog = "https://github.com/celynw/kellog/blob/master/CHANGELOG.md"
 [project.optional-dependencies]
 dev = ["ruff", "mypy", "pytest", "colored_traceback"]
 
+[tool.setuptools]
+packages = ["kellog"]
+
 [tool.ruff]
 line-length = 120
 
