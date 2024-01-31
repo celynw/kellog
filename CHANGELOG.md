@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.1
+
+### Added
+
+- `typing_extensions` as a dependency.
+  It was being installed automatically as part of the `[dev]` dependencies
+
 ## 1.0.0
 
 ### Added
